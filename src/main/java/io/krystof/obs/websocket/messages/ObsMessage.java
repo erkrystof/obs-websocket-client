@@ -1,0 +1,45 @@
+package io.krystof.obs.websocket.messages;
+
+import org.pojomatic.annotations.AutoProperty;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+@AutoProperty
+public abstract class ObsMessage extends AbstractObsDataTransferObject {
+
+	@JsonProperty("op")
+	private OperationCode operationCode;
+
+	public OperationCode getOperationCode() {
+		return operationCode;
+	}
+
+	public void setOperationCode(OperationCode operationCode) {
+		this.operationCode = operationCode;
+	}
+
+	public enum OperationCode {
+		Hello(0),
+		Identify(1),
+		Identified(2),
+		ReIdentify(3),
+		Event(5),
+		Request(6),
+		RequestResponse(7),
+		RequestBatch(8),
+		RequestBatchResponse(9);
+
+		private final int value;
+
+		OperationCode(int value) {
+			this.value = value;
+		}
+
+		@JsonValue
+		public int getValue() {
+			return value;
+		}
+	}
+
+}
