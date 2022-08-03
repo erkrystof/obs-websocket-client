@@ -13,7 +13,7 @@ class DemoApplicationTests {
 	@Autowired
 	TestBean bean;
 
-	@Value("${obs.url")
+	@Value("${obs.url}")
 	String obsUrl;
 
 	@Value("${obs.password}")
