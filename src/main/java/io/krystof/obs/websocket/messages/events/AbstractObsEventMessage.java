@@ -1,6 +1,13 @@
 package io.krystof.obs.websocket.messages.events;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.pojomatic.annotations.AutoProperty;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import io.krystof.obs.websocket.messages.AbstractObsDataTransferObject;
 import io.krystof.obs.websocket.messages.ObsMessage;
@@ -9,14 +16,24 @@ import io.krystof.obs.websocket.messages.ObsMessage;
 public abstract class AbstractObsEventMessage extends ObsMessage {
 
 	public AbstractObsEventMessage() {
-		super.setOperationCode(OperationCode.Event);
+		this(null);
 	}
 
+	public AbstractObsEventMessage(Object eventData) {
+		super.setOperationCode(OperationCode.Event);
+		this.payload = new Payload();
+		payload.setEventData(eventData);
+	}
+
+	@JsonProperty("d")
+	protected Payload payload;
+
 	@AutoProperty
-	public static class Data extends AbstractObsDataTransferObject {
+	public static class Payload extends AbstractObsDataTransferObject {
 
 		private EventType eventType;
 		private Intent eventIntent;
+		private Object eventData;
 
 		public EventType getEventType() {
 			return eventType;
@@ -34,10 +51,24 @@ public abstract class AbstractObsEventMessage extends ObsMessage {
 			this.eventIntent = eventIntent;
 		}
 
+		public Object getEventData() {
+			return eventData;
+		}
+
+		public void setEventData(Object eventData) {
+			this.eventData = eventData;
+		}
+
+	}
+
+	public void setEventData(Object eventData) {
+		this.payload.setEventData(eventData);
 	}
 
 	public enum EventType {
-		// General
+		//Scene Items
+		CurrentProgramSceneChanged(CurrentProgramSceneChanged.class),
+		// UI
 		SceneItemSelected(SceneItemSelectedEvent.class);
 
 		private final Class<? extends AbstractObsEventMessage> eventClass;
@@ -117,9 +148,25 @@ public abstract class AbstractObsEventMessage extends ObsMessage {
 			this.value = value;
 		}
 
+		@JsonValue
 		public int getValue() {
 			return value;
 		}
+
+		private static final Map<Integer, Intent> mMap = Collections.unmodifiableMap(initializeMapping());
+
+		public static Intent getByValue(Integer value) {
+			return mMap.get(value);
+		}
+
+		private static Map<Integer, Intent> initializeMapping() {
+			Map<Integer, Intent> mMap = new HashMap<>();
+			for (Intent s : Intent.values()) {
+				mMap.put(s.getValue(), s);
+			}
+			return mMap;
+		}
+
 	}
 
 }

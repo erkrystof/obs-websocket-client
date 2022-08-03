@@ -8,9 +8,11 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.krystof.obs.websocket.messages.ObsMessage.OperationCode;
 import io.krystof.obs.websocket.messages.auth.Helo;
 import io.krystof.obs.websocket.messages.auth.Identified;
 import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage;
+import io.krystof.obs.websocket.messages.requests.AbstractObsRequestMessage.RequestResponse;
 
 public class ObsMessageDeserializer extends JsonDeserializer<ObsMessage> {
 
@@ -20,19 +22,21 @@ public class ObsMessageDeserializer extends JsonDeserializer<ObsMessage> {
 
 		JsonNode node = p.getCodec().readTree(p);
 
-		int opCode = node.get("op").asInt(-1);
+		OperationCode operationCode = OperationCode.getByValue(node.get("op").asInt(-1));
 
-		switch (opCode) {
-		case 0:
+		switch (operationCode) {
+		case Hello:
 			return p.getCodec().treeToValue(node, Helo.class);
-		case 2:
+		case Identified:
 			return p.getCodec().treeToValue(node, Identified.class);
-		case 5:
+		case Event:
 			return p.getCodec().treeToValue(node,
 					AbstractObsEventMessage.EventType.valueOf(node.get("d").get("eventType").asText()).getEventClass());
-		case -1:
+		case RequestResponse:
+			return p.getCodec().treeToValue(node,
+					RequestResponse.valueOf(node.get("d").get("requestType").asText()).getResponseClass());
 		default:
-			throw new RuntimeException("Invalid op code:" + opCode + " for Node: " + node);
+			throw new RuntimeException("Unsupported operation code " + operationCode + " for Node: " + node);
 		}
 	}
 

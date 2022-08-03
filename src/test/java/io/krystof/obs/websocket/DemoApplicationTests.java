@@ -1,27 +1,35 @@
 package io.krystof.obs.websocket;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.io.IOException;
+import java.util.Properties;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class DemoApplicationTests {
 
-	@Autowired
-	TestBean bean;
+	public static Properties props = new Properties();
 
-	@Value("${obs.url}")
-	String obsUrl;
+	TestBean bean = new TestBean();
 
-	@Value("${obs.password}")
-	String obsPassword;
+	@BeforeEach
+	public void before() throws IOException {
+		props.load(
+				Thread
+						.currentThread()
+						.getContextClassLoader()
+						.getResourceAsStream("application.properties"));
+
+	}
+
+
 
 	@Test
 	void contextLoads() {
-		assertEquals("Yup!", bean.getTest(obsUrl, obsPassword));
+		bean.getTest(props.getProperty("obs.url"), props.getProperty("obs.password"));
 	}
 
 }

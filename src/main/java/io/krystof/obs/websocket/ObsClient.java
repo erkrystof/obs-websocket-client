@@ -6,7 +6,14 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.krystof.obs.websocket.messages.requests.AbstractObsRequestMessage;
+import io.krystof.obs.websocket.messages.requests.inputs.GetInputKindListRequest;
+import io.krystof.obs.websocket.messages.requests.inputs.GetInputSettingsRequest;
+import io.krystof.obs.websocket.messages.requests.scenes.GetSceneItemListRequest;
+import io.krystof.obs.websocket.messages.requests.ui.SetStudioModeEnabledRequest;
+import io.krystof.obs.websocket.messages.responses.inputs.GetInputKindListResponse;
+import io.krystof.obs.websocket.messages.responses.inputs.GetInputSettingsResponse;
+import io.krystof.obs.websocket.messages.responses.scenes.GetSceneItemListResponse;
+import io.krystof.obs.websocket.messages.responses.ui.SetStudioModeEnabledResponse;
 
 public class ObsClient {
 
@@ -18,7 +25,13 @@ public class ObsClient {
 		} else {
 			obsWebSocket = new ObsWebSocket(host, eventSubscriptionMask);
 		}
+
+		ui = new UIRequestResponseService(obsWebSocket);
+		input = new InputRequestResponseService(obsWebSocket);
 	}
+
+	public UIRequestResponseService ui;
+	public InputRequestResponseService input;
 
 	private URI host;
 
@@ -26,9 +39,46 @@ public class ObsClient {
 
 	private ObsWebSocket obsWebSocket;
 
-	public void simpleSendRequest(AbstractObsRequestMessage request) {
-		obsWebSocket.sendRequest(request);
+	public static class UIRequestResponseService {
 
+		ObsWebSocket obsWebSocket;
+
+		public UIRequestResponseService(ObsWebSocket obsWebSocket) {
+			this.obsWebSocket = obsWebSocket;
+		}
+
+		public SetStudioModeEnabledResponse callSetStudioModeEnabled(boolean enabled) {
+			return obsWebSocket
+					.sendRequestWaitForResponse(new SetStudioModeEnabledRequest(enabled),
+							SetStudioModeEnabledResponse.class);
+		}
+	}
+
+	public static class InputRequestResponseService {
+
+		ObsWebSocket obsWebSocket;
+
+		public InputRequestResponseService(ObsWebSocket obsWebSocket) {
+			this.obsWebSocket = obsWebSocket;
+		}
+
+		public GetSceneItemListResponse callGetSceneItemList(String sceneName) {
+			return obsWebSocket
+					.sendRequestWaitForResponse(new GetSceneItemListRequest(sceneName),
+							GetSceneItemListResponse.class);
+		}
+
+		public GetInputSettingsResponse callGetInputSettings(String inputName) {
+			return obsWebSocket
+					.sendRequestWaitForResponse(new GetInputSettingsRequest(inputName),
+							GetInputSettingsResponse.class);
+		}
+
+		public GetInputKindListResponse callGetInputKindList(boolean unversioned) {
+			return obsWebSocket
+					.sendRequestWaitForResponse(new GetInputKindListRequest(unversioned),
+							GetInputKindListResponse.class);
+		}
 	}
 
 }

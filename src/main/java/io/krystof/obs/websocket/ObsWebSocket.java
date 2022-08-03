@@ -6,9 +6,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ import io.krystof.obs.websocket.messages.auth.Identified;
 import io.krystof.obs.websocket.messages.auth.Identity;
 import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage;
 import io.krystof.obs.websocket.messages.requests.AbstractObsRequestMessage;
+import io.krystof.obs.websocket.messages.requests.AbstractObsResponseMessage;
 
 public class ObsWebSocket extends WebSocketClient {
 	private static final Logger LOG = LoggerFactory.getLogger(ObsWebSocket.class);
@@ -38,6 +41,8 @@ public class ObsWebSocket extends WebSocketClient {
 	Optional<Integer> eventMask;
 
 	CountDownLatch startSignal = new CountDownLatch(1);
+
+	private ConcurrentHashMap<String, RequestResponsePair> openRequestsAndResponses = new ConcurrentHashMap<>();
 
 	public ObsWebSocket(URI serverUri, Optional<Integer> eventsToListenFor) {
 		super(serverUri);
@@ -77,16 +82,17 @@ public class ObsWebSocket extends WebSocketClient {
 
 	@Override
 	public void onMessage(String message) {
-		LOG.info("onMessage: {}", message);
+		LOG.info("onMessage JSON: {}", message);
 		try {
 			ObsMessage obsMessage = objectMapper.readValue(message, ObsMessage.class);
-			LOG.info("RECEIVE OBS Message: {}", obsMessage);
 			if (obsMessage instanceof Helo) {
 				handleHelo(Helo.class.cast(obsMessage));
 			} else if (obsMessage instanceof Identified) {
 				handleIdentified(Identified.class.cast(obsMessage));
 			} else if (obsMessage instanceof AbstractObsEventMessage) {
 				handleAbstractEventMessage(AbstractObsEventMessage.class.cast(obsMessage));
+			} else if (obsMessage instanceof AbstractObsResponseMessage) {
+				handleAbstractRequestResponseMessage(AbstractObsResponseMessage.class.cast(obsMessage));
 			} else {
 				throw new MessageHandlingException("Unsupported message: " + obsMessage);
 			}
@@ -95,19 +101,32 @@ public class ObsWebSocket extends WebSocketClient {
 		}
 	}
 
+	private void handleAbstractRequestResponseMessage(AbstractObsResponseMessage abstractObsResponseMessage) {
+		LOG.info("Handle Response: {}", abstractObsResponseMessage);
+		RequestResponsePair requestResponsePair = openRequestsAndResponses
+				.get(abstractObsResponseMessage.getData().getRequestId());
+		if (requestResponsePair == null) {
+			LOG.warn("Unattached response encountered, could not map to open request: {}", abstractObsResponseMessage);
+		}
+		requestResponsePair.setResponse(abstractObsResponseMessage);
+		requestResponsePair.getCountDownLatch().countDown();
+	}
+
 	private void handleAbstractEventMessage(AbstractObsEventMessage abstractObsEventMessage) {
-		LOG.info("Handle Event: {}", abstractObsEventMessage);
+		LOG.info("handleAbstractEventMessage: {}", abstractObsEventMessage);
 	}
 
 	private void handleIdentified(Identified identified) {
-		LOG.info("Identified!");
+		LOG.info("handleIdentified: {}", identified);
 		startSignal.countDown();
 	}
 
 	private void send(ObsMessage obsMessage) {
-		LOG.info("SEND: {}", obsMessage);
+		LOG.info("send: (Object): {}", obsMessage);
 		try {
-			send(objectMapper.writeValueAsString(obsMessage));
+			String jsonToSend = objectMapper.writeValueAsString(obsMessage);
+			LOG.info("send: (JSON): {}", jsonToSend);
+			send(jsonToSend);
 		} catch (JsonProcessingException e) {
 			throw new MessageHandlingException("Error sending message.", e);
 		}
@@ -154,7 +173,11 @@ public class ObsWebSocket extends WebSocketClient {
 		LOG.info("onClose: code: {}  reason:{}  remote:{}", code, reason, remote);
 	}
 
-	public void sendRequest(AbstractObsRequestMessage request) {
+	@SuppressWarnings("unchecked")
+	public <T> T sendRequestWaitForResponse(AbstractObsRequestMessage abstractObsRequestMessage,
+			Class<T> responseClass) {
+		StopWatch sw = new StopWatch();
+		sw.start();
 		try {
 			startSignal.await(10, TimeUnit.SECONDS);
 			if (startSignal.getCount() > 0) {
@@ -164,6 +187,64 @@ public class ObsWebSocket extends WebSocketClient {
 			Thread.interrupted();
 			throw new RuntimeException(e);
 		}
-		send(request);
+
+		RequestResponsePair requestResponsePair = new RequestResponsePair(abstractObsRequestMessage);
+
+		openRequestsAndResponses.put(abstractObsRequestMessage.getData().getRequestId(),
+				requestResponsePair);
+
+		try {
+			send(abstractObsRequestMessage);
+			requestResponsePair.getCountDownLatch().await(10, TimeUnit.SECONDS);
+			if (startSignal.getCount() > 0) {
+				throw new RuntimeException("Timeout waiting for Request Response: " + abstractObsRequestMessage);
+			}
+		} catch (InterruptedException e) {
+			Thread.interrupted();
+			throw new RuntimeException(e);
+		}
+
+		sw.stop();
+		LOG.info("In/Out for Request: {}, {} ms.", abstractObsRequestMessage.getData().getRequestType(), sw.getTime());
+		return (T) requestResponsePair.getResponse();
+
+	}
+
+}
+
+class RequestResponsePair {
+
+	private CountDownLatch countDownLatch = new CountDownLatch(1);
+
+	public RequestResponsePair(Object request) {
+		super();
+		this.request = request;
+	}
+
+	private Object request;
+	private Object response;
+
+	public Object getRequest() {
+		return request;
+	}
+
+	public void setRequest(Object request) {
+		this.request = request;
+	}
+
+	public Object getResponse() {
+		return response;
+	}
+
+	public void setResponse(Object response) {
+		this.response = response;
+	}
+
+	public CountDownLatch getCountDownLatch() {
+		return countDownLatch;
+	}
+
+	public void setCountDownLatch(CountDownLatch countDownLatch) {
+		this.countDownLatch = countDownLatch;
 	}
 }

@@ -9,19 +9,23 @@ import io.krystof.obs.websocket.messages.requests.AbstractObsRequestMessage;
 public class SetStudioModeEnabledRequest extends AbstractObsRequestMessage {
 
 	public SetStudioModeEnabledRequest() {
-		super(AbstractObsRequestMessage.RequestResponse.SetStudioModeEnabled);
-		super.setRequestData(new Data().setStudioModeEnabled(true));
+		this(true);
+	}
+
+	public SetStudioModeEnabledRequest(boolean enabled) {
+		super(AbstractObsRequestMessage.RequestResponse.SetStudioModeEnabled,
+				new RequestData().setStudioModeEnabled(enabled));
 	}
 
 	@AutoProperty
-	public static class Data extends AbstractObsDataTransferObject {
+	public static class RequestData extends AbstractObsDataTransferObject {
 		private boolean studioModeEnabled;
 
 		public boolean isStudioModeEnabled() {
 			return studioModeEnabled;
 		}
 
-		public Data setStudioModeEnabled(boolean studioModeEnabled) {
+		public RequestData setStudioModeEnabled(boolean studioModeEnabled) {
 			this.studioModeEnabled = studioModeEnabled;
 			return this;
 		}

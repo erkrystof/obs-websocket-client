@@ -1,5 +1,9 @@
 package io.krystof.obs.websocket.messages;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.pojomatic.annotations.AutoProperty;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -40,6 +44,22 @@ public abstract class ObsMessage extends AbstractObsDataTransferObject {
 		public int getValue() {
 			return value;
 		}
+		
+		private static final Map<Integer, OperationCode> mMap = Collections.unmodifiableMap(initializeMapping());
+
+		public static OperationCode getByValue(Integer value) {
+			return mMap.get(value);
+		}
+
+		private static Map<Integer, OperationCode> initializeMapping() {
+			Map<Integer, OperationCode> mMap = new HashMap<>();
+			for (OperationCode s : OperationCode.values()) {
+				mMap.put(s.getValue(), s);
+			}
+			return mMap;
+		}
+
+		
 	}
 
 }

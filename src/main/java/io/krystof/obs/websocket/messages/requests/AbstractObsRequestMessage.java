@@ -8,25 +8,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.krystof.obs.websocket.messages.AbstractObsDataTransferObject;
 import io.krystof.obs.websocket.messages.ObsMessage;
+import io.krystof.obs.websocket.messages.requests.inputs.GetInputKindListRequest;
+import io.krystof.obs.websocket.messages.requests.inputs.GetInputSettingsRequest;
+import io.krystof.obs.websocket.messages.requests.scenes.GetSceneItemListRequest;
 import io.krystof.obs.websocket.messages.requests.ui.SetStudioModeEnabledRequest;
+import io.krystof.obs.websocket.messages.responses.inputs.GetInputKindListResponse;
+import io.krystof.obs.websocket.messages.responses.inputs.GetInputSettingsResponse;
+import io.krystof.obs.websocket.messages.responses.scenes.GetSceneItemListResponse;
 import io.krystof.obs.websocket.messages.responses.ui.SetStudioModeEnabledResponse;
 
 @AutoProperty
 public abstract class AbstractObsRequestMessage extends ObsMessage {
 
 	public AbstractObsRequestMessage() {
+		this(null, null);
+	}
+
+	public AbstractObsRequestMessage(RequestResponse requestResponse,
+			Object requestData) {
 		super.setOperationCode(OperationCode.Request);
 		this.data = new Data();
 		data.requestId = UUID.randomUUID().toString();
-	}
-
-	public AbstractObsRequestMessage(RequestResponse requestResponseType) {
-		this();
-		data.requestType = requestResponseType;
+		this.data.setRequestType(requestResponse);
+		setRequestData(requestData);
 	}
 
 	@JsonProperty("d")
-	protected Data data;
+	private Data data;
 
 	protected void setRequestData(
 			Object requestData) {
@@ -67,7 +75,12 @@ public abstract class AbstractObsRequestMessage extends ObsMessage {
 	}
 
 	public enum RequestResponse {
-		// General
+		// Scene Items Requests
+		GetSceneItemList(GetSceneItemListRequest.class, GetSceneItemListResponse.class),
+		//Inputs
+		GetInputSettings(GetInputSettingsRequest.class, GetInputSettingsResponse.class),
+		GetInputKindList(GetInputKindListRequest.class, GetInputKindListResponse.class),
+		// UI
 		SetStudioModeEnabled(SetStudioModeEnabledRequest.class, SetStudioModeEnabledResponse.class);
 
 		private final Class<? extends AbstractObsRequestMessage> requestClass;
@@ -87,6 +100,10 @@ public abstract class AbstractObsRequestMessage extends ObsMessage {
 			return responseClass;
 		}
 
+	}
+
+	public Data getData() {
+		return data;
 	}
 
 }
