@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import io.krystof.obs.websocket.exceptions.InvalidResponseStatusCodeException;
 import io.krystof.obs.websocket.exceptions.MessageHandlingException;
 import io.krystof.obs.websocket.messages.ObsMessage;
 import io.krystof.obs.websocket.messages.ObsMessageDeserializer;
@@ -29,7 +30,9 @@ import io.krystof.obs.websocket.messages.auth.Identified;
 import io.krystof.obs.websocket.messages.auth.Identity;
 import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage;
 import io.krystof.obs.websocket.messages.requests.AbstractObsRequestMessage;
-import io.krystof.obs.websocket.messages.requests.AbstractObsResponseMessage;
+import io.krystof.obs.websocket.messages.responses.AbstractObsResponseMessage;
+import io.krystof.obs.websocket.messages.responses.AbstractResponseSpecificDataObject;
+import io.krystof.obs.websocket.messages.responses.AbstractResponseSpecificDataObjectDeserializer;
 
 public class ObsWebSocket extends WebSocketClient {
 	private static final Logger LOG = LoggerFactory.getLogger(ObsWebSocket.class);
@@ -45,7 +48,12 @@ public class ObsWebSocket extends WebSocketClient {
 	private ConcurrentHashMap<String, RequestResponsePair> openRequestsAndResponses = new ConcurrentHashMap<>();
 
 	public ObsWebSocket(URI serverUri, Optional<Integer> eventsToListenFor) {
+		this(serverUri, null, eventsToListenFor);
+	}
+
+	public ObsWebSocket(URI serverUri, String password, Optional<Integer> eventsToListenFor) {
 		super(serverUri);
+		this.password = password;
 		addHeader("Sec-WebSocket-Protocol", "obswebsocket.json");
 		if (eventsToListenFor == null) {
 			throw new IllegalArgumentException("Pass an empty optional in for events to listen for, not just null.");
@@ -59,17 +67,14 @@ public class ObsWebSocket extends WebSocketClient {
 		}
 	}
 
-	public ObsWebSocket(URI host, String password, Optional<Integer> eventsToListenFor) {
-		this(host, eventsToListenFor);
-		this.password = password;
-	}
-
 	@SuppressWarnings("serial")
 	private ObjectMapper createObjectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.registerModule(new SimpleModule() {
 			{
 				addDeserializer(ObsMessage.class, new ObsMessageDeserializer());
+				addDeserializer(AbstractResponseSpecificDataObject.class,
+						new AbstractResponseSpecificDataObjectDeserializer());
 			}
 		});
 		return objectMapper;
@@ -102,7 +107,7 @@ public class ObsWebSocket extends WebSocketClient {
 	}
 
 	private void handleAbstractRequestResponseMessage(AbstractObsResponseMessage abstractObsResponseMessage) {
-		LOG.info("Handle Response: {}", abstractObsResponseMessage);
+		LOG.info("Handle Response Object: {}", abstractObsResponseMessage);
 		RequestResponsePair requestResponsePair = openRequestsAndResponses
 				.get(abstractObsResponseMessage.getData().getRequestId());
 		if (requestResponsePair == null) {
@@ -126,7 +131,23 @@ public class ObsWebSocket extends WebSocketClient {
 		try {
 			String jsonToSend = objectMapper.writeValueAsString(obsMessage);
 			LOG.info("send: (JSON): {}", jsonToSend);
-			send(jsonToSend);
+
+			if (isOpen()) {
+				send(jsonToSend);
+			} else {
+				LOG.warn("Not open - trying to reconnect");
+				synchronized (this) {
+					try {
+						this.startSignal = new CountDownLatch(1);
+						this.reconnect();
+						startSignal.await();
+						send(obsMessage);
+					} catch (InterruptedException e) {
+						Thread.interrupted();
+						throw new RuntimeException("Interrupted while trying to reconnect.", e);
+					}
+				}
+			}
 		} catch (JsonProcessingException e) {
 			throw new MessageHandlingException("Error sending message.", e);
 		}
@@ -165,7 +186,6 @@ public class ObsWebSocket extends WebSocketClient {
 	@Override
 	public void onError(Exception ex) {
 		LOG.info("onError: {}", ex);
-
 	}
 
 	@Override
@@ -188,7 +208,8 @@ public class ObsWebSocket extends WebSocketClient {
 			throw new RuntimeException(e);
 		}
 
-		RequestResponsePair requestResponsePair = new RequestResponsePair(abstractObsRequestMessage);
+		RequestResponsePair requestResponsePair = new RequestResponsePair(
+				abstractObsRequestMessage);
 
 		openRequestsAndResponses.put(abstractObsRequestMessage.getData().getRequestId(),
 				requestResponsePair);
@@ -204,9 +225,21 @@ public class ObsWebSocket extends WebSocketClient {
 			throw new RuntimeException(e);
 		}
 
+		handleResponseCodeErrors(requestResponsePair,
+				requestResponsePair.getResponse().getData().getRequestStatus().getCode());
+
 		sw.stop();
 		LOG.info("In/Out for Request: {}, {} ms.", abstractObsRequestMessage.getData().getRequestType(), sw.getTime());
 		return (T) requestResponsePair.getResponse();
+
+	}
+
+	private void handleResponseCodeErrors(
+			RequestResponsePair requestResponsePair, int code) {
+		if (code != 100) {
+			throw new InvalidResponseStatusCodeException(code, code + " - " +
+					requestResponsePair.getResponse().getData().getRequestStatus().getComment());
+		}
 
 	}
 
@@ -216,29 +249,13 @@ class RequestResponsePair {
 
 	private CountDownLatch countDownLatch = new CountDownLatch(1);
 
-	public RequestResponsePair(Object request) {
+	public RequestResponsePair(AbstractObsRequestMessage request) {
 		super();
 		this.request = request;
 	}
 
-	private Object request;
-	private Object response;
-
-	public Object getRequest() {
-		return request;
-	}
-
-	public void setRequest(Object request) {
-		this.request = request;
-	}
-
-	public Object getResponse() {
-		return response;
-	}
-
-	public void setResponse(Object response) {
-		this.response = response;
-	}
+	private AbstractObsRequestMessage request;
+	private AbstractObsResponseMessage response;
 
 	public CountDownLatch getCountDownLatch() {
 		return countDownLatch;
@@ -247,4 +264,21 @@ class RequestResponsePair {
 	public void setCountDownLatch(CountDownLatch countDownLatch) {
 		this.countDownLatch = countDownLatch;
 	}
+
+	public AbstractObsRequestMessage getRequest() {
+		return request;
+	}
+
+	public void setRequest(AbstractObsRequestMessage request) {
+		this.request = request;
+	}
+
+	public AbstractObsResponseMessage getResponse() {
+		return response;
+	}
+
+	public void setResponse(AbstractObsResponseMessage response) {
+		this.response = response;
+	}
+
 }

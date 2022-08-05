@@ -1,4 +1,4 @@
-package io.krystof.obs.websocket.messages.requests.scenes;
+package io.krystof.obs.websocket.messages.requests.scene_items;
 
 import org.pojomatic.annotations.AutoProperty;
 

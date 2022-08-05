@@ -11,6 +11,16 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import io.krystof.obs.websocket.messages.AbstractObsDataTransferObject;
 import io.krystof.obs.websocket.messages.ObsMessage;
+import io.krystof.obs.websocket.messages.events.media_inputs.MediaInputActionTriggered;
+import io.krystof.obs.websocket.messages.events.media_inputs.MediaInputPlaybackEnded;
+import io.krystof.obs.websocket.messages.events.media_inputs.MediaInputPlaybackStarted;
+import io.krystof.obs.websocket.messages.events.scene_items.SceneItemEnableStateChanged;
+import io.krystof.obs.websocket.messages.events.scene_items.SceneItemSelectedEvent;
+import io.krystof.obs.websocket.messages.events.scenes.CurrentPreviewSceneChanged;
+import io.krystof.obs.websocket.messages.events.scenes.CurrentProgramSceneChanged;
+import io.krystof.obs.websocket.messages.events.transitions.SceneTransitionEnded;
+import io.krystof.obs.websocket.messages.events.transitions.SceneTransitionStarted;
+import io.krystof.obs.websocket.messages.events.transitions.SceneTransitionVideoEnded;
 
 @AutoProperty
 public abstract class AbstractObsEventMessage extends ObsMessage {
@@ -66,10 +76,20 @@ public abstract class AbstractObsEventMessage extends ObsMessage {
 	}
 
 	public enum EventType {
-		//Scene Items
+		// Transititions
+		SceneTransitionEnded(SceneTransitionEnded.class),
+		SceneTransitionVideoEnded(SceneTransitionVideoEnded.class),
+		SceneTransitionStarted(SceneTransitionStarted.class),
+		// Scenes
 		CurrentProgramSceneChanged(CurrentProgramSceneChanged.class),
-		// UI
-		SceneItemSelected(SceneItemSelectedEvent.class);
+		CurrentPreviewSceneChanged(CurrentPreviewSceneChanged.class),
+		// Scene Items
+		SceneItemSelected(SceneItemSelectedEvent.class),
+		SceneItemEnableStateChanged(SceneItemEnableStateChanged.class),
+		// Media Inputs
+		MediaInputPlaybackEnded(MediaInputPlaybackEnded.class),
+		MediaInputPlaybackStarted(MediaInputPlaybackStarted.class),
+		MediaInputActionTriggered(MediaInputActionTriggered.class);
 
 		private final Class<? extends AbstractObsEventMessage> eventClass;
 
@@ -167,6 +187,14 @@ public abstract class AbstractObsEventMessage extends ObsMessage {
 			return mMap;
 		}
 
+	}
+
+	public Payload getPayload() {
+		return payload;
+	}
+
+	public void setPayload(Payload payload) {
+		this.payload = payload;
 	}
 
 }

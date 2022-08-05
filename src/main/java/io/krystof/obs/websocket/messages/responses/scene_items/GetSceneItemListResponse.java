@@ -1,4 +1,4 @@
-package io.krystof.obs.websocket.messages.responses.inputs;
+package io.krystof.obs.websocket.messages.responses.scene_items;
 
 import java.util.List;
 
@@ -9,9 +9,9 @@ import io.krystof.obs.websocket.messages.responses.AbstractObsResponseMessage;
 import io.krystof.obs.websocket.messages.responses.AbstractResponseSpecificDataObject;
 
 @AutoProperty
-public class GetInputKindListResponse extends AbstractObsResponseMessage {
-	public GetInputKindListResponse() {
-		super(AbstractObsRequestMessage.RequestResponse.GetInputKindList);
+public class GetSceneItemListResponse extends AbstractObsResponseMessage {
+	public GetSceneItemListResponse() {
+		super(AbstractObsRequestMessage.RequestResponse.GetSceneItemList);
 		super.setResponseData(new ResponseData());
 	}
 
@@ -22,15 +22,16 @@ public class GetInputKindListResponse extends AbstractObsResponseMessage {
 	@AutoProperty
 	public static class ResponseData extends AbstractResponseSpecificDataObject {
 
-		private List<String> inputKinds;
+		private List<SceneItem> sceneItems;
 
-		public List<String> getInputKinds() {
-			return inputKinds;
+		public List<SceneItem> getSceneItems() {
+			return sceneItems;
 		}
 
-		public void setInputKinds(List<String> inputKinds) {
-			this.inputKinds = inputKinds;
+		public void setSceneItems(List<SceneItem> sceneItems) {
+			this.sceneItems = sceneItems;
 		}
+
 
 	}
 }

@@ -1,6 +1,4 @@
-package io.krystof.obs.websocket.messages.responses.inputs;
-
-import java.util.List;
+package io.krystof.obs.websocket.messages.responses.scenes;
 
 import org.pojomatic.annotations.AutoProperty;
 
@@ -9,9 +7,9 @@ import io.krystof.obs.websocket.messages.responses.AbstractObsResponseMessage;
 import io.krystof.obs.websocket.messages.responses.AbstractResponseSpecificDataObject;
 
 @AutoProperty
-public class GetInputKindListResponse extends AbstractObsResponseMessage {
-	public GetInputKindListResponse() {
-		super(AbstractObsRequestMessage.RequestResponse.GetInputKindList);
+public class GetCurrentPreviewSceneResponse extends AbstractObsResponseMessage {
+	public GetCurrentPreviewSceneResponse() {
+		super(AbstractObsRequestMessage.RequestResponse.GetCurrentPreviewScene);
 		super.setResponseData(new ResponseData());
 	}
 
@@ -21,15 +19,14 @@ public class GetInputKindListResponse extends AbstractObsResponseMessage {
 
 	@AutoProperty
 	public static class ResponseData extends AbstractResponseSpecificDataObject {
+		private String currentPreviewSceneName;
 
-		private List<String> inputKinds;
-
-		public List<String> getInputKinds() {
-			return inputKinds;
+		public String getCurrentPreviewSceneName() {
+			return currentPreviewSceneName;
 		}
 
-		public void setInputKinds(List<String> inputKinds) {
-			this.inputKinds = inputKinds;
+		public void setCurrentPreviewSceneName(String currentProgramSceneName) {
+			this.currentPreviewSceneName = currentProgramSceneName;
 		}
 
 	}

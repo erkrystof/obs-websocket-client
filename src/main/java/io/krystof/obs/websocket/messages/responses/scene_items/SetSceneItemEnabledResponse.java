@@ -1,6 +1,4 @@
-package io.krystof.obs.websocket.messages.responses.inputs;
-
-import java.util.List;
+package io.krystof.obs.websocket.messages.responses.scene_items;
 
 import org.pojomatic.annotations.AutoProperty;
 
@@ -9,9 +7,9 @@ import io.krystof.obs.websocket.messages.responses.AbstractObsResponseMessage;
 import io.krystof.obs.websocket.messages.responses.AbstractResponseSpecificDataObject;
 
 @AutoProperty
-public class GetInputKindListResponse extends AbstractObsResponseMessage {
-	public GetInputKindListResponse() {
-		super(AbstractObsRequestMessage.RequestResponse.GetInputKindList);
+public class SetSceneItemEnabledResponse extends AbstractObsResponseMessage {
+	public SetSceneItemEnabledResponse() {
+		super(AbstractObsRequestMessage.RequestResponse.SetSceneItemEnabled);
 		super.setResponseData(new ResponseData());
 	}
 
@@ -22,15 +20,7 @@ public class GetInputKindListResponse extends AbstractObsResponseMessage {
 	@AutoProperty
 	public static class ResponseData extends AbstractResponseSpecificDataObject {
 
-		private List<String> inputKinds;
 
-		public List<String> getInputKinds() {
-			return inputKinds;
-		}
-
-		public void setInputKinds(List<String> inputKinds) {
-			this.inputKinds = inputKinds;
-		}
 
 	}
 }
