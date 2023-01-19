@@ -2,14 +2,15 @@ package io.krystof.obs.websocket.messages.events.scene_items;
 
 import org.pojomatic.annotations.AutoProperty;
 
-import io.krystof.obs.websocket.messages.AbstractObsDataTransferObject;
+import io.krystof.obs.websocket.messages.events.AbstractEventSpecificDataObject;
 import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage;
 
 @AutoProperty
 public class SceneItemEnableStateChanged extends AbstractObsEventMessage {
 
 	public SceneItemEnableStateChanged() {
-		super(new EventData());
+		super(AbstractObsEventMessage.EventType.SceneItemEnableStateChanged, new EventData());
+
 	}
 
 	public EventData getEventSpecificData() {
@@ -17,7 +18,7 @@ public class SceneItemEnableStateChanged extends AbstractObsEventMessage {
 	}
 
 	@AutoProperty
-	public static class EventData extends AbstractObsDataTransferObject {
+	public static class EventData extends AbstractEventSpecificDataObject {
 
 		private String sceneName;
 

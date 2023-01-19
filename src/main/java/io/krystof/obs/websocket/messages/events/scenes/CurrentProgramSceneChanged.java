@@ -2,14 +2,14 @@ package io.krystof.obs.websocket.messages.events.scenes;
 
 import org.pojomatic.annotations.AutoProperty;
 
-import io.krystof.obs.websocket.messages.AbstractObsDataTransferObject;
+import io.krystof.obs.websocket.messages.events.AbstractEventSpecificDataObject;
 import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage;
 
 @AutoProperty
 public class CurrentProgramSceneChanged extends AbstractObsEventMessage {
 
 	public CurrentProgramSceneChanged() {
-		super(new EventData());
+		super(AbstractObsEventMessage.EventType.CurrentProgramSceneChanged, new EventData());
 	}
 
 	public EventData getEventSpecificData() {
@@ -17,7 +17,7 @@ public class CurrentProgramSceneChanged extends AbstractObsEventMessage {
 	}
 
 	@AutoProperty
-	public static class EventData extends AbstractObsDataTransferObject {
+	public static class EventData extends AbstractEventSpecificDataObject {
 
 		private String sceneName;
 

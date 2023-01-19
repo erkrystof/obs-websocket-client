@@ -1,4 +1,4 @@
-package io.krystof.obs.websocket.messages.events.scene_items;
+package io.krystof.obs.websocket.messages.events.scenes;
 
 import org.pojomatic.annotations.AutoProperty;
 
@@ -6,10 +6,10 @@ import io.krystof.obs.websocket.messages.events.AbstractEventSpecificDataObject;
 import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage;
 
 @AutoProperty
-public class SceneItemSelectedEvent extends AbstractObsEventMessage {
+public class SceneRemoved extends AbstractObsEventMessage {
 
-	public SceneItemSelectedEvent() {
-		super(AbstractObsEventMessage.EventType.SceneItemSelected, new EventData());
+	public SceneRemoved() {
+		super(AbstractObsEventMessage.EventType.SceneRemoved, new EventData());
 	}
 
 	public EventData getEventSpecificData() {
@@ -19,17 +19,9 @@ public class SceneItemSelectedEvent extends AbstractObsEventMessage {
 	@AutoProperty
 	public static class EventData extends AbstractEventSpecificDataObject {
 
-		private Integer sceneItemId;
-
 		private String sceneName;
 
-		public Integer getSceneItemId() {
-			return sceneItemId;
-		}
-
-		public void setSceneItemId(Integer sceneItemId) {
-			this.sceneItemId = sceneItemId;
-		}
+		private boolean isGroup;
 
 		public String getSceneName() {
 			return sceneName;
@@ -37,6 +29,14 @@ public class SceneItemSelectedEvent extends AbstractObsEventMessage {
 
 		public void setSceneName(String sceneName) {
 			this.sceneName = sceneName;
+		}
+
+		public boolean isGroup() {
+			return isGroup;
+		}
+
+		public void setGroup(boolean isGroup) {
+			this.isGroup = isGroup;
 		}
 	}
 

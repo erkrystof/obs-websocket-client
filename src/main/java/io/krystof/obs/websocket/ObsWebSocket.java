@@ -6,8 +6,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.StopWatch;
@@ -28,6 +31,8 @@ import io.krystof.obs.websocket.messages.auth.Authentication;
 import io.krystof.obs.websocket.messages.auth.Helo;
 import io.krystof.obs.websocket.messages.auth.Identified;
 import io.krystof.obs.websocket.messages.auth.Identity;
+import io.krystof.obs.websocket.messages.events.AbstractEventSpecificDataObject;
+import io.krystof.obs.websocket.messages.events.AbstractEventSpecificDataObjectDeserializer;
 import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage;
 import io.krystof.obs.websocket.messages.requests.AbstractObsRequestMessage;
 import io.krystof.obs.websocket.messages.responses.AbstractObsResponseMessage;
@@ -45,7 +50,11 @@ public class ObsWebSocket extends WebSocketClient {
 
 	CountDownLatch startSignal = new CountDownLatch(1);
 
+	Set<ObsEventListener> obsEventListeners = ConcurrentHashMap.newKeySet();
+
 	private ConcurrentHashMap<String, RequestResponsePair> openRequestsAndResponses = new ConcurrentHashMap<>();
+
+	ExecutorService eventListenerExecutorService = Executors.newFixedThreadPool(10);
 
 	public ObsWebSocket(URI serverUri, Optional<Integer> eventsToListenFor) {
 		this(serverUri, null, eventsToListenFor);
@@ -67,6 +76,10 @@ public class ObsWebSocket extends WebSocketClient {
 		}
 	}
 
+	public void addEventListener(ObsEventListener obsEventListener) {
+		obsEventListeners.add(obsEventListener);
+	}
+
 	@SuppressWarnings("serial")
 	private ObjectMapper createObjectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -75,6 +88,8 @@ public class ObsWebSocket extends WebSocketClient {
 				addDeserializer(ObsMessage.class, new ObsMessageDeserializer());
 				addDeserializer(AbstractResponseSpecificDataObject.class,
 						new AbstractResponseSpecificDataObjectDeserializer());
+				addDeserializer(AbstractEventSpecificDataObject.class,
+						new AbstractEventSpecificDataObjectDeserializer());
 			}
 		});
 		return objectMapper;
@@ -117,8 +132,13 @@ public class ObsWebSocket extends WebSocketClient {
 		requestResponsePair.getCountDownLatch().countDown();
 	}
 
+	// Listeners must get these on different threads from the firing thread. The
+	// onMessage parent method must complete before new requests can be made.
 	private void handleAbstractEventMessage(AbstractObsEventMessage abstractObsEventMessage) {
 		LOG.info("handleAbstractEventMessage: {}", abstractObsEventMessage);
+		obsEventListeners.forEach(listener -> {
+			eventListenerExecutorService.submit(() -> listener.eventFired(abstractObsEventMessage));
+		});
 	}
 
 	private void handleIdentified(Identified identified) {
@@ -140,7 +160,7 @@ public class ObsWebSocket extends WebSocketClient {
 					try {
 						this.startSignal = new CountDownLatch(1);
 						this.reconnect();
-						startSignal.await();
+						startSignal.await(5, TimeUnit.SECONDS);
 						send(obsMessage);
 					} catch (InterruptedException e) {
 						Thread.interrupted();

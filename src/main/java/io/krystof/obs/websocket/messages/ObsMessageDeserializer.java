@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.krystof.obs.websocket.messages.ObsMessage.OperationCode;
 import io.krystof.obs.websocket.messages.auth.Helo;
 import io.krystof.obs.websocket.messages.auth.Identified;
-import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage;
+import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage.EventType;
 import io.krystof.obs.websocket.messages.requests.AbstractObsRequestMessage.RequestResponse;
 
 public class ObsMessageDeserializer extends JsonDeserializer<ObsMessage> {
@@ -31,7 +31,7 @@ public class ObsMessageDeserializer extends JsonDeserializer<ObsMessage> {
 			return p.getCodec().treeToValue(node, Identified.class);
 		case Event:
 			return p.getCodec().treeToValue(node,
-					AbstractObsEventMessage.EventType.valueOf(node.get("d").get("eventType").asText()).getEventClass());
+					EventType.valueOf(node.get("d").get("eventType").asText()).getEventClass());
 		case RequestResponse:
 			return p.getCodec().treeToValue(node,
 					RequestResponse.valueOf(node.get("d").get("requestType").asText()).getResponseClass());

@@ -2,14 +2,14 @@ package io.krystof.obs.websocket.messages.events.transitions;
 
 import org.pojomatic.annotations.AutoProperty;
 
-import io.krystof.obs.websocket.messages.AbstractObsDataTransferObject;
+import io.krystof.obs.websocket.messages.events.AbstractEventSpecificDataObject;
 import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage;
 
 @AutoProperty
 public class SceneTransitionVideoEnded extends AbstractObsEventMessage {
 
 	public SceneTransitionVideoEnded() {
-		super(new EventData());
+		super(AbstractObsEventMessage.EventType.SceneTransitionVideoEnded, new EventData());
 	}
 
 	public EventData getEventSpecificData() {
@@ -17,7 +17,7 @@ public class SceneTransitionVideoEnded extends AbstractObsEventMessage {
 	}
 
 	@AutoProperty
-	public static class EventData extends AbstractObsDataTransferObject {
+	public static class EventData extends AbstractEventSpecificDataObject {
 
 		private String transitionName;
 

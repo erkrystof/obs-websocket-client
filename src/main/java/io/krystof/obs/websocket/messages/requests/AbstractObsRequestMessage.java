@@ -11,6 +11,7 @@ import io.krystof.obs.websocket.messages.ObsMessage;
 import io.krystof.obs.websocket.messages.requests.inputs.GetInputKindListRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.GetInputSettingsRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.SetInputSettingsRequest;
+import io.krystof.obs.websocket.messages.requests.media_inputs.GetMediaInputStatusRequest;
 import io.krystof.obs.websocket.messages.requests.media_inputs.TriggerMediaInputActionRequest;
 import io.krystof.obs.websocket.messages.requests.scene_items.GetSceneItemEnabledRequest;
 import io.krystof.obs.websocket.messages.requests.scene_items.GetSceneItemListRequest;
@@ -25,6 +26,7 @@ import io.krystof.obs.websocket.messages.responses.AbstractObsResponseMessage;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputKindListResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputSettingsResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.SetInputSettingsResponse;
+import io.krystof.obs.websocket.messages.responses.media_inputs.GetMediaInputStatusResponse;
 import io.krystof.obs.websocket.messages.responses.media_inputs.TriggerMediaInputActionResponse;
 import io.krystof.obs.websocket.messages.responses.scene_items.GetSceneItemEnabledResponse;
 import io.krystof.obs.websocket.messages.responses.scene_items.GetSceneItemListResponse;
@@ -110,6 +112,7 @@ public abstract class AbstractObsRequestMessage extends ObsMessage {
 		SetInputSettings(SetInputSettingsRequest.class, SetInputSettingsResponse.class),
 		// Media Inputs
 		TriggerMediaInputAction(TriggerMediaInputActionRequest.class, TriggerMediaInputActionResponse.class),
+		GetMediaInputStatus(GetMediaInputStatusRequest.class, GetMediaInputStatusResponse.class),
 		// UI
 		SetStudioModeEnabled(SetStudioModeEnabledRequest.class, SetStudioModeEnabledResponse.class);
 

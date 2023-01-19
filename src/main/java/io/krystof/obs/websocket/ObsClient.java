@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import io.krystof.obs.websocket.messages.requests.inputs.GetInputKindListRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.GetInputSettingsRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.SetInputSettingsRequest;
+import io.krystof.obs.websocket.messages.requests.media_inputs.GetMediaInputStatusRequest;
 import io.krystof.obs.websocket.messages.requests.media_inputs.TriggerMediaInputActionRequest;
 import io.krystof.obs.websocket.messages.requests.scene_items.GetSceneItemEnabledRequest;
 import io.krystof.obs.websocket.messages.requests.scene_items.GetSceneItemListRequest;
@@ -25,6 +26,7 @@ import io.krystof.obs.websocket.messages.requests.ui.SetStudioModeEnabledRequest
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputKindListResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputSettingsResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.SetInputSettingsResponse;
+import io.krystof.obs.websocket.messages.responses.media_inputs.GetMediaInputStatusResponse;
 import io.krystof.obs.websocket.messages.responses.media_inputs.TriggerMediaInputActionResponse;
 import io.krystof.obs.websocket.messages.responses.scene_items.GetSceneItemEnabledResponse;
 import io.krystof.obs.websocket.messages.responses.scene_items.GetSceneItemListResponse;
@@ -166,6 +168,12 @@ public class ObsClient implements Closeable {
 					.sendRequestWaitForResponse(new TriggerMediaInputActionRequest(inputName, mediaAction),
 							TriggerMediaInputActionResponse.class);
 		}
+
+		public GetMediaInputStatusResponse getMediaInputStatus(String inputName) {
+			return obsWebSocket
+					.sendRequestWaitForResponse(new GetMediaInputStatusRequest(inputName),
+							GetMediaInputStatusResponse.class);
+		}
 	}
 
 	private static final Logger LOG = LoggerFactory.getLogger(ObsClient.class);
@@ -198,6 +206,10 @@ public class ObsClient implements Closeable {
 		sceneItems = new SceneItemsRequestResponseService(obsWebSocket);
 		scenes = new SceneRequestResponseService(obsWebSocket);
 		mediaInputs = new MediaInputRequestResponseService(obsWebSocket);
+	}
+
+	public void addEventListener(ObsEventListener obsEventListener) {
+		obsWebSocket.addEventListener(obsEventListener);
 	}
 
 	@Override

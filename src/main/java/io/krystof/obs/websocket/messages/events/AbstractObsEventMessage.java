@@ -18,6 +18,7 @@ import io.krystof.obs.websocket.messages.events.scene_items.SceneItemEnableState
 import io.krystof.obs.websocket.messages.events.scene_items.SceneItemSelectedEvent;
 import io.krystof.obs.websocket.messages.events.scenes.CurrentPreviewSceneChanged;
 import io.krystof.obs.websocket.messages.events.scenes.CurrentProgramSceneChanged;
+import io.krystof.obs.websocket.messages.events.scenes.SceneRemoved;
 import io.krystof.obs.websocket.messages.events.transitions.SceneTransitionEnded;
 import io.krystof.obs.websocket.messages.events.transitions.SceneTransitionStarted;
 import io.krystof.obs.websocket.messages.events.transitions.SceneTransitionVideoEnded;
@@ -25,14 +26,11 @@ import io.krystof.obs.websocket.messages.events.transitions.SceneTransitionVideo
 @AutoProperty
 public abstract class AbstractObsEventMessage extends ObsMessage {
 
-	public AbstractObsEventMessage() {
-		this(null);
-	}
-
-	public AbstractObsEventMessage(Object eventData) {
+	public AbstractObsEventMessage(EventType eventType, AbstractEventSpecificDataObject eventData) {
 		super.setOperationCode(OperationCode.Event);
 		this.payload = new Payload();
-		payload.setEventData(eventData);
+		payload.eventType = eventType;
+		setEventData(eventData);
 	}
 
 	@JsonProperty("d")
@@ -43,7 +41,7 @@ public abstract class AbstractObsEventMessage extends ObsMessage {
 
 		private EventType eventType;
 		private Intent eventIntent;
-		private Object eventData;
+		private AbstractEventSpecificDataObject eventData;
 
 		public EventType getEventType() {
 			return eventType;
@@ -65,14 +63,14 @@ public abstract class AbstractObsEventMessage extends ObsMessage {
 			return eventData;
 		}
 
-		public void setEventData(Object eventData) {
+		public void setEventData(AbstractEventSpecificDataObject eventData) {
 			this.eventData = eventData;
 		}
 
 	}
 
-	public void setEventData(Object eventData) {
-		this.payload.setEventData(eventData);
+	public void setEventData(AbstractEventSpecificDataObject eventData) {
+		payload.eventData = eventData;
 	}
 
 	public enum EventType {
@@ -81,6 +79,7 @@ public abstract class AbstractObsEventMessage extends ObsMessage {
 		SceneTransitionVideoEnded(SceneTransitionVideoEnded.class),
 		SceneTransitionStarted(SceneTransitionStarted.class),
 		// Scenes
+		SceneRemoved(SceneRemoved.class),
 		CurrentProgramSceneChanged(CurrentProgramSceneChanged.class),
 		CurrentPreviewSceneChanged(CurrentPreviewSceneChanged.class),
 		// Scene Items
