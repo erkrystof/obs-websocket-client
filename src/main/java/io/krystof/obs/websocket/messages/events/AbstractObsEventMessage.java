@@ -18,6 +18,8 @@ import io.krystof.obs.websocket.messages.events.scene_items.SceneItemEnableState
 import io.krystof.obs.websocket.messages.events.scene_items.SceneItemSelectedEvent;
 import io.krystof.obs.websocket.messages.events.scenes.CurrentPreviewSceneChanged;
 import io.krystof.obs.websocket.messages.events.scenes.CurrentProgramSceneChanged;
+import io.krystof.obs.websocket.messages.events.scenes.SceneCreated;
+import io.krystof.obs.websocket.messages.events.scenes.SceneNameChanged;
 import io.krystof.obs.websocket.messages.events.scenes.SceneRemoved;
 import io.krystof.obs.websocket.messages.events.transitions.SceneTransitionEnded;
 import io.krystof.obs.websocket.messages.events.transitions.SceneTransitionStarted;
@@ -80,6 +82,8 @@ public abstract class AbstractObsEventMessage extends ObsMessage {
 		SceneTransitionStarted(SceneTransitionStarted.class),
 		// Scenes
 		SceneRemoved(SceneRemoved.class),
+		SceneCreated(SceneCreated.class),
+		SceneNameChanged(SceneNameChanged.class),
 		CurrentProgramSceneChanged(CurrentProgramSceneChanged.class),
 		CurrentPreviewSceneChanged(CurrentPreviewSceneChanged.class),
 		// Scene Items

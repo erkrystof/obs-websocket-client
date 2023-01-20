@@ -6,10 +6,10 @@ import io.krystof.obs.websocket.messages.events.AbstractEventSpecificDataObject;
 import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage;
 
 @AutoProperty
-public class SceneRemoved extends AbstractObsEventMessage {
+public class SceneCreated extends AbstractObsEventMessage {
 
-	public SceneRemoved() {
-		super(AbstractObsEventMessage.EventType.SceneRemoved, new EventData());
+	public SceneCreated() {
+		super(AbstractObsEventMessage.EventType.SceneCreated, new EventData());
 	}
 
 	public EventData getEventSpecificData() {
@@ -35,7 +35,7 @@ public class SceneRemoved extends AbstractObsEventMessage {
 			return isGroup;
 		}
 
-		public void setIsGroup(boolean isGroup) {
+		public void setGroup(boolean isGroup) {
 			this.isGroup = isGroup;
 		}
 	}

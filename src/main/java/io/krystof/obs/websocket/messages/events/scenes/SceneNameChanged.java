@@ -6,10 +6,10 @@ import io.krystof.obs.websocket.messages.events.AbstractEventSpecificDataObject;
 import io.krystof.obs.websocket.messages.events.AbstractObsEventMessage;
 
 @AutoProperty
-public class SceneRemoved extends AbstractObsEventMessage {
+public class SceneNameChanged extends AbstractObsEventMessage {
 
-	public SceneRemoved() {
-		super(AbstractObsEventMessage.EventType.SceneRemoved, new EventData());
+	public SceneNameChanged() {
+		super(AbstractObsEventMessage.EventType.SceneNameChanged, new EventData());
 	}
 
 	public EventData getEventSpecificData() {
@@ -19,9 +19,17 @@ public class SceneRemoved extends AbstractObsEventMessage {
 	@AutoProperty
 	public static class EventData extends AbstractEventSpecificDataObject {
 
+		private String oldSceneName;
+
 		private String sceneName;
 
-		private boolean isGroup;
+		public String getOldSceneName() {
+			return oldSceneName;
+		}
+
+		public void setOldSceneName(String oldSceneName) {
+			this.oldSceneName = oldSceneName;
+		}
 
 		public String getSceneName() {
 			return sceneName;
@@ -31,13 +39,7 @@ public class SceneRemoved extends AbstractObsEventMessage {
 			this.sceneName = sceneName;
 		}
 
-		public boolean isGroup() {
-			return isGroup;
-		}
 
-		public void setIsGroup(boolean isGroup) {
-			this.isGroup = isGroup;
-		}
 	}
 
 }
