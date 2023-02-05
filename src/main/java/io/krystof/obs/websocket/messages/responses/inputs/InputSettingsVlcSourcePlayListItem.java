@@ -5,7 +5,7 @@ import org.pojomatic.annotations.AutoProperty;
 import io.krystof.obs.websocket.messages.AbstractObsDataTransferObject;
 
 @AutoProperty
-public class InputSettingsVlcSourcePlayList extends AbstractObsDataTransferObject {
+public class InputSettingsVlcSourcePlayListItem extends AbstractObsDataTransferObject {
 
 	private boolean hidden = false;
 	private boolean selected = false;

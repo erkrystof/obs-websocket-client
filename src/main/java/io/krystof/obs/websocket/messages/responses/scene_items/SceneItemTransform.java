@@ -6,6 +6,15 @@ import io.krystof.obs.websocket.messages.AbstractObsDataTransferObject;
 
 @AutoProperty
 public class SceneItemTransform extends AbstractObsDataTransferObject {
+
+	public static final String OBS_BOUNDS_NONE = "OBS_BOUNDS_NONE";
+	public static final String OBS_BOUNDS_STRETCH = "OBS_BOUNDS_STRETCH";
+	public static final String OBS_BOUNDS_SCALE_INNER = "OBS_BOUNDS_SCALE_INNER";
+	public static final String OBS_BOUNDS_SCALE_OUTER = "OBS_BOUNDS_SCALE_OUTER";
+	public static final String OBS_BOUNDS_SCALE_TO_WIDTH = "OBS_BOUNDS_SCALE_TO_WIDTH";
+	public static final String OBS_BOUNDS_SCALE_TO_HEIGHT = "OBS_BOUNDS_SCALE_TO_HEIGHT";
+	public static final String OBS_BOUNDS_MAX_ONLY = "OBS_BOUNDS_MAX_ONLY";
+
 	private int alignment;
 	private int boundsAlignment;
 	private double boundsHeight;
