@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import io.krystof.obs.websocket.messages.requests.inputs.GetInputKindListRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.GetInputSettingsRequest;
+import io.krystof.obs.websocket.messages.requests.inputs.PressInputPropertiesButtonRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.SetInputSettingsRequest;
 import io.krystof.obs.websocket.messages.requests.media_inputs.GetMediaInputStatusRequest;
 import io.krystof.obs.websocket.messages.requests.media_inputs.SetMediaInputCursorRequest;
@@ -26,6 +27,7 @@ import io.krystof.obs.websocket.messages.requests.scenes.SetCurrentProgramSceneR
 import io.krystof.obs.websocket.messages.requests.ui.SetStudioModeEnabledRequest;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputKindListResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputSettingsResponse;
+import io.krystof.obs.websocket.messages.responses.inputs.PressInputPropertiesButtonResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.SetInputSettingsResponse;
 import io.krystof.obs.websocket.messages.responses.media_inputs.GetMediaInputStatusResponse;
 import io.krystof.obs.websocket.messages.responses.media_inputs.SetMediaInputCursorResponse;
@@ -138,6 +140,12 @@ public class ObsClient implements Closeable {
 			return obsWebSocket
 					.sendRequestWaitForResponse(new GetInputSettingsRequest(inputName),
 							GetInputSettingsResponse.class);
+		}
+
+		public PressInputPropertiesButtonResponse pressInputPropertiesButton(String inputName, String propertyName) {
+			return obsWebSocket
+					.sendRequestWaitForResponse(new PressInputPropertiesButtonRequest(inputName, propertyName),
+							PressInputPropertiesButtonResponse.class);
 		}
 
 	}

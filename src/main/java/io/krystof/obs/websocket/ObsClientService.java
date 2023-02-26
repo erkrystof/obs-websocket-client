@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.krystof.obs.websocket.messages.requests.inputs.PressInputPropertiesButtonRequest;
 import io.krystof.obs.websocket.messages.requests.media_inputs.TriggerMediaInputActionRequest;
 import io.krystof.obs.websocket.messages.responses.inputs.InputSettingsVlcSourcePlayListItem;
 import io.krystof.obs.websocket.messages.responses.media_inputs.GetMediaInputStatusResponse;
@@ -210,7 +211,26 @@ public class ObsClientService {
 			Thread.currentThread().interrupt();
 			throw new RuntimeException("Interrupted.", e);
 		}
-	
+
+	}
+
+	public String getBrowserSourceUrl(String sourceName) {
+		return (String) obsClient.inputs.getInputSettings(sourceName).getSpecificResponseData().getInputSettings()
+				.get("url");
+	}
+
+	public void setBrowserSourceUrl(String sourceName, String newUrl) {
+		Map<String, Object> newInputSettings = new HashMap<>();
+		newInputSettings.put("url", newUrl);
+		obsClient.inputs.setInputSettings(sourceName, newInputSettings, true);
+		internalCommandDelay();
+		LOG.info("setBrowserSourceUrl: {}, {}", sourceName, newUrl);
+	}
+
+	public void refreshBrowser(String browserSourceName) {
+		obsClient.inputs.pressInputPropertiesButton(browserSourceName,
+				PressInputPropertiesButtonRequest.PROPERTY_NAME_REFRESH_BROWSER_NO_CACHE);
+		internalCommandDelay();
 	}
 
 }
