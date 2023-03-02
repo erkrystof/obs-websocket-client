@@ -10,8 +10,10 @@ import io.krystof.obs.websocket.messages.AbstractObsDataTransferObject;
 import io.krystof.obs.websocket.messages.ObsMessage;
 import io.krystof.obs.websocket.messages.requests.inputs.GetInputKindListRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.GetInputSettingsRequest;
+import io.krystof.obs.websocket.messages.requests.inputs.GetInputVolumeRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.PressInputPropertiesButtonRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.SetInputSettingsRequest;
+import io.krystof.obs.websocket.messages.requests.inputs.SetInputVolumeRequest;
 import io.krystof.obs.websocket.messages.requests.media_inputs.GetMediaInputStatusRequest;
 import io.krystof.obs.websocket.messages.requests.media_inputs.SetMediaInputCursorRequest;
 import io.krystof.obs.websocket.messages.requests.media_inputs.TriggerMediaInputActionRequest;
@@ -27,8 +29,10 @@ import io.krystof.obs.websocket.messages.requests.ui.SetStudioModeEnabledRequest
 import io.krystof.obs.websocket.messages.responses.AbstractObsResponseMessage;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputKindListResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputSettingsResponse;
+import io.krystof.obs.websocket.messages.responses.inputs.GetInputVolumeResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.PressInputPropertiesButtonResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.SetInputSettingsResponse;
+import io.krystof.obs.websocket.messages.responses.inputs.SetInputVolumeResponse;
 import io.krystof.obs.websocket.messages.responses.media_inputs.GetMediaInputStatusResponse;
 import io.krystof.obs.websocket.messages.responses.media_inputs.SetMediaInputCursorResponse;
 import io.krystof.obs.websocket.messages.responses.media_inputs.TriggerMediaInputActionResponse;
@@ -112,6 +116,8 @@ public abstract class AbstractObsRequestMessage extends ObsMessage {
 		GetSceneItemEnabled(GetSceneItemEnabledRequest.class, GetSceneItemEnabledResponse.class),
 		// Inputs
 		GetInputSettings(GetInputSettingsRequest.class, GetInputSettingsResponse.class),
+		GetInputVolume(GetInputVolumeRequest.class, GetInputVolumeResponse.class),
+		SetInputVolume(SetInputVolumeRequest.class, SetInputVolumeResponse.class),
 		GetInputKindList(GetInputKindListRequest.class, GetInputKindListResponse.class),
 		SetInputSettings(SetInputSettingsRequest.class, SetInputSettingsResponse.class),
 		PressInputPropertiesButton(PressInputPropertiesButtonRequest.class, PressInputPropertiesButtonResponse.class),

@@ -11,8 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import io.krystof.obs.websocket.messages.requests.inputs.GetInputKindListRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.GetInputSettingsRequest;
+import io.krystof.obs.websocket.messages.requests.inputs.GetInputVolumeRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.PressInputPropertiesButtonRequest;
 import io.krystof.obs.websocket.messages.requests.inputs.SetInputSettingsRequest;
+import io.krystof.obs.websocket.messages.requests.inputs.SetInputVolumeRequest;
 import io.krystof.obs.websocket.messages.requests.media_inputs.GetMediaInputStatusRequest;
 import io.krystof.obs.websocket.messages.requests.media_inputs.SetMediaInputCursorRequest;
 import io.krystof.obs.websocket.messages.requests.media_inputs.TriggerMediaInputActionRequest;
@@ -27,8 +29,10 @@ import io.krystof.obs.websocket.messages.requests.scenes.SetCurrentProgramSceneR
 import io.krystof.obs.websocket.messages.requests.ui.SetStudioModeEnabledRequest;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputKindListResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputSettingsResponse;
+import io.krystof.obs.websocket.messages.responses.inputs.GetInputVolumeResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.PressInputPropertiesButtonResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.SetInputSettingsResponse;
+import io.krystof.obs.websocket.messages.responses.inputs.SetInputVolumeResponse;
 import io.krystof.obs.websocket.messages.responses.media_inputs.GetMediaInputStatusResponse;
 import io.krystof.obs.websocket.messages.responses.media_inputs.SetMediaInputCursorResponse;
 import io.krystof.obs.websocket.messages.responses.media_inputs.TriggerMediaInputActionResponse;
@@ -140,6 +144,18 @@ public class ObsClient implements Closeable {
 			return obsWebSocket
 					.sendRequestWaitForResponse(new GetInputSettingsRequest(inputName),
 							GetInputSettingsResponse.class);
+		}
+
+		public GetInputVolumeResponse getInputVolume(String inputName) {
+			return obsWebSocket
+					.sendRequestWaitForResponse(new GetInputVolumeRequest(inputName),
+							GetInputVolumeResponse.class);
+		}
+
+		public SetInputVolumeResponse setInputVolume(String inputName, Long inputVolumeDb) {
+			return obsWebSocket
+					.sendRequestWaitForResponse(new SetInputVolumeRequest(inputName, inputVolumeDb),
+							SetInputVolumeResponse.class);
 		}
 
 		public PressInputPropertiesButtonResponse pressInputPropertiesButton(String inputName, String propertyName) {

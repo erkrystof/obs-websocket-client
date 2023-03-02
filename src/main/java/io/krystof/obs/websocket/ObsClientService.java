@@ -91,6 +91,13 @@ public class ObsClientService {
 		setSourceVisibility(sceneName, sourceName, visible, false);
 	}
 
+	public void setInputVolumesTo(List<String> inputSourceNames, long inputVolume) {
+		for (String inputSource: inputSourceNames) {
+			obsClient.inputs.setInputVolume(inputSource, inputVolume);
+			internalCommandDelay();
+		}
+	}
+
 	public void setSourceVisibility(String sceneName, String sourceName, boolean visible, boolean quiet) {
 		int sceneSourceId = obsClient.sceneItems.getSceneItemList(sceneName)
 				.getSpecificResponseData()
