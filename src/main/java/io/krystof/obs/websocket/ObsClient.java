@@ -26,6 +26,7 @@ import io.krystof.obs.websocket.messages.requests.scenes.GetCurrentPreviewSceneR
 import io.krystof.obs.websocket.messages.requests.scenes.GetCurrentProgramSceneRequest;
 import io.krystof.obs.websocket.messages.requests.scenes.SetCurrentPreviewSceneRequest;
 import io.krystof.obs.websocket.messages.requests.scenes.SetCurrentProgramSceneRequest;
+import io.krystof.obs.websocket.messages.requests.sources.GetSourceActiveRequest;
 import io.krystof.obs.websocket.messages.requests.ui.SetStudioModeEnabledRequest;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputKindListResponse;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputSettingsResponse;
@@ -44,6 +45,7 @@ import io.krystof.obs.websocket.messages.responses.scenes.GetCurrentPreviewScene
 import io.krystof.obs.websocket.messages.responses.scenes.GetCurrentProgramSceneResponse;
 import io.krystof.obs.websocket.messages.responses.scenes.SetCurrentPreviewSceneResponse;
 import io.krystof.obs.websocket.messages.responses.scenes.SetCurrentProgramSceneResponse;
+import io.krystof.obs.websocket.messages.responses.sources.GetSourceActiveResponse;
 import io.krystof.obs.websocket.messages.responses.ui.SetStudioModeEnabledResponse;
 
 public class ObsClient implements Closeable {
@@ -114,6 +116,23 @@ public class ObsClient implements Closeable {
 			return obsWebSocket
 					.sendRequestWaitForResponse(new SetCurrentProgramSceneRequest(sceneName),
 							SetCurrentProgramSceneResponse.class);
+		}
+
+	}
+
+	public static class SourceRequestResponseService {
+
+		public SourceRequestResponseService(ObsWebSocket obsWebSocket) {
+			super();
+			this.obsWebSocket = obsWebSocket;
+		}
+
+		ObsWebSocket obsWebSocket;
+
+		public GetSourceActiveResponse getSourceActive(String sourceName) {
+			return obsWebSocket
+					.sendRequestWaitForResponse(new GetSourceActiveRequest(sourceName),
+							GetSourceActiveResponse.class);
 		}
 
 	}
@@ -216,6 +235,8 @@ public class ObsClient implements Closeable {
 
 	public MediaInputRequestResponseService mediaInputs;
 
+	public SourceRequestResponseService sources;
+
 	public SceneItemsRequestResponseService sceneItems;
 
 	public SceneRequestResponseService scenes;
@@ -238,6 +259,7 @@ public class ObsClient implements Closeable {
 		sceneItems = new SceneItemsRequestResponseService(obsWebSocket);
 		scenes = new SceneRequestResponseService(obsWebSocket);
 		mediaInputs = new MediaInputRequestResponseService(obsWebSocket);
+		sources = new SourceRequestResponseService(obsWebSocket);
 	}
 
 	public void addEventListener(ObsEventListener obsEventListener) {

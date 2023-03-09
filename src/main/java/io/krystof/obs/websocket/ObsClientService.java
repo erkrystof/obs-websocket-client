@@ -240,4 +240,8 @@ public class ObsClientService {
 		internalCommandDelay();
 	}
 
+	public boolean isSourceActive(String sourceName) {
+		return obsClient.sources.getSourceActive(sourceName).getSpecificResponseData().isVideoActive();
+	}
+
 }

@@ -25,6 +25,7 @@ import io.krystof.obs.websocket.messages.requests.scenes.GetCurrentPreviewSceneR
 import io.krystof.obs.websocket.messages.requests.scenes.GetCurrentProgramSceneRequest;
 import io.krystof.obs.websocket.messages.requests.scenes.SetCurrentPreviewSceneRequest;
 import io.krystof.obs.websocket.messages.requests.scenes.SetCurrentProgramSceneRequest;
+import io.krystof.obs.websocket.messages.requests.sources.GetSourceActiveRequest;
 import io.krystof.obs.websocket.messages.requests.ui.SetStudioModeEnabledRequest;
 import io.krystof.obs.websocket.messages.responses.AbstractObsResponseMessage;
 import io.krystof.obs.websocket.messages.responses.inputs.GetInputKindListResponse;
@@ -44,6 +45,7 @@ import io.krystof.obs.websocket.messages.responses.scenes.GetCurrentPreviewScene
 import io.krystof.obs.websocket.messages.responses.scenes.GetCurrentProgramSceneResponse;
 import io.krystof.obs.websocket.messages.responses.scenes.SetCurrentPreviewSceneResponse;
 import io.krystof.obs.websocket.messages.responses.scenes.SetCurrentProgramSceneResponse;
+import io.krystof.obs.websocket.messages.responses.sources.GetSourceActiveResponse;
 import io.krystof.obs.websocket.messages.responses.ui.SetStudioModeEnabledResponse;
 
 @AutoProperty
@@ -114,6 +116,8 @@ public abstract class AbstractObsRequestMessage extends ObsMessage {
 		GetSceneList(GetSceneListRequest.class, GetSceneListResponse.class),
 		SetSceneItemEnabled(SetSceneItemEnabledRequest.class, SetSceneItemEnabledResponse.class),
 		GetSceneItemEnabled(GetSceneItemEnabledRequest.class, GetSceneItemEnabledResponse.class),
+		// Sources
+		GetSourceActive(GetSourceActiveRequest.class, GetSourceActiveResponse.class),
 		// Inputs
 		GetInputSettings(GetInputSettingsRequest.class, GetInputSettingsResponse.class),
 		GetInputVolume(GetInputVolumeRequest.class, GetInputVolumeResponse.class),
