@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import io.krystof.obs.websocket.messages.AbstractObsDataTransferObject;
 import io.krystof.obs.websocket.messages.ObsMessage;
+import io.krystof.obs.websocket.messages.events.inputs.InputActiveStateChanged;
 import io.krystof.obs.websocket.messages.events.media_inputs.MediaInputActionTriggered;
 import io.krystof.obs.websocket.messages.events.media_inputs.MediaInputPlaybackEnded;
 import io.krystof.obs.websocket.messages.events.media_inputs.MediaInputPlaybackStarted;
@@ -92,7 +93,9 @@ public abstract class AbstractObsEventMessage extends ObsMessage {
 		// Media Inputs
 		MediaInputPlaybackEnded(MediaInputPlaybackEnded.class),
 		MediaInputPlaybackStarted(MediaInputPlaybackStarted.class),
-		MediaInputActionTriggered(MediaInputActionTriggered.class);
+		MediaInputActionTriggered(MediaInputActionTriggered.class),
+		// Inputs
+		InputActiveStateChanged(InputActiveStateChanged.class);
 
 		private final Class<? extends AbstractObsEventMessage> eventClass;
 
@@ -146,24 +149,25 @@ public abstract class AbstractObsEventMessage extends ObsMessage {
 		 * Receive events in the `MediaInputs` category
 		 */
 		MediaInputs(1 << 8),
+	
+		/**
+		 * InputVolumeMeters event (high-volume)
+		 */
+		InputVolumeMeters(1 << 16),
+		/**
+		 * InputActiveStateChanged event (high-volume)
+		 */
+		InputActiveStateChanged(1 << 17),
+		/**
+		 * InputShowStateChanged event (high-volume)
+		 */
+		InputShowStateChanged(1 << 18),
+		
 		/**
 		 * Receive all event categories (default subscription setting)
 		 */
 		All(General.value | Config.value | Scenes.value | Inputs.value | Transitions.value
-				| Filters.value | Outputs.value | SceneItems.value | MediaInputs.value),
-		/**
-		 * InputVolumeMeters event (high-volume)
-		 */
-		InputVolumeMeters(1 << 9),
-		/**
-		 * InputActiveStateChanged event (high-volume)
-		 */
-		InputActiveStateChanged(1 << 10),
-		/**
-		 * InputShowStateChanged event (high-volume)
-		 */
-		InputShowStateChanged(1 << 11),
-		;
+				| Filters.value | Outputs.value | SceneItems.value | MediaInputs.value);
 
 		private final int value;
 
