@@ -53,6 +53,13 @@ public class ObsClientService {
 		}
 	}
 
+	public void stopMediaOrVlcSource(String mediaSourceName) {
+		obsClient.mediaInputs.triggerMediaInputAction(mediaSourceName,
+				TriggerMediaInputActionRequest.OBS_WEBSOCKET_MEDIA_INPUT_ACTION_STOP);
+		LOG.info("STOP: {}", mediaSourceName);
+		internalCommandDelay();
+	}
+
 	public void pauseMediaOrVlcSourceRegardlessOfState(String mediaSourceName) {
 		obsClient.mediaInputs.triggerMediaInputAction(mediaSourceName,
 				TriggerMediaInputActionRequest.OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PAUSE);
@@ -64,6 +71,13 @@ public class ObsClientService {
 		obsClient.mediaInputs.triggerMediaInputAction(mediaSourceName,
 				TriggerMediaInputActionRequest.OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY);
 		LOG.info("PLAY: {}", mediaSourceName);
+		internalCommandDelay();
+	}
+
+	public void restartMediaOrVlcSource(String mediaSourceName) {
+		obsClient.mediaInputs.triggerMediaInputAction(mediaSourceName,
+				TriggerMediaInputActionRequest.OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART);
+		LOG.info("RESTART: {}", mediaSourceName);
 		internalCommandDelay();
 	}
 
@@ -92,7 +106,7 @@ public class ObsClientService {
 	}
 
 	public void setInputVolumesTo(List<String> inputSourceNames, long inputVolume) {
-		for (String inputSource: inputSourceNames) {
+		for (String inputSource : inputSourceNames) {
 			obsClient.inputs.setInputVolume(inputSource, inputVolume);
 			internalCommandDelay();
 		}
@@ -186,6 +200,14 @@ public class ObsClientService {
 			internalCommandDelay();
 			LOG.info("SET CURSOR: {} on {}", newCursor, sourceName);
 		}
+	}
+
+	public void setMediaInputCursorInMs(String sourceName, int newCursor) {
+		Map<String, Object> newSettings = new HashMap<>();
+		newSettings.put("mediaCursor", newCursor);
+		obsClient.mediaInputs.setMediaInputCursor(sourceName, newCursor);
+		internalCommandDelay();
+		LOG.info("SET CURSOR: {} on {}", newCursor, sourceName);
 	}
 
 	public GetMediaInputStatusResponse getStatusOfMediaSource(String sourceName) {
