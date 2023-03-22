@@ -205,7 +205,7 @@ public class ObsWebSocket extends WebSocketClient {
 
 	@Override
 	public void onError(Exception ex) {
-		LOG.info("onError: {}", ex);
+		LOG.info("onError: ", ex);
 	}
 
 	@Override
@@ -221,6 +221,7 @@ public class ObsWebSocket extends WebSocketClient {
 		try {
 			startSignal.await(10, TimeUnit.SECONDS);
 			if (startSignal.getCount() > 0) {
+				this.reconnect();
 				throw new RuntimeException("Timeout waiting for OBS Identification Response.");
 			}
 		} catch (InterruptedException e) {
